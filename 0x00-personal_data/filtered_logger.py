@@ -3,39 +3,11 @@
 import re
 import logging
 from typing import List
-import mysql.connector
+import mysql.connector as mysql
 import os
 
 
 PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
-
-
-def get_db() -> mysql.connector.connection.MySQLConnection:
-    """Creates a connector to a database.
-    """
-    db_host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
-    db_name = os.getenv("PERSONAL_DATA_DB_NAME", "my_db")
-    db_user = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
-    db_pwd = os.getenv("PERSONAL_DATA_DB_PASSWORD")
-    connection = mysql.connector.connection.MySQLConnection(
-        host=db_host,
-        user=db_user,
-        password=db_pwd,
-        database=db_name,
-    )
-    return connection
-
-
-def main() -> None:
-    """ function that obtains a database connection using get_db
-        and returns a list of tuples containing all rows in the
-        users table
-    """
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM users;")
-    for row in cursor:
-        print(row)
 
 
 def filter_datum(fields: List[str], redaction: str,
@@ -89,6 +61,34 @@ def get_logger() -> logging.Logger:
     log_handler.setFormatter(RedactingFormatter(PII_FIELDS))
     logger.addHandler(log_handler)
     return logger
+
+
+def get_db() -> mysql.connection.MySQLConnection:
+    """Creates a connector to a database.
+    """
+    db_user = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    db_pwd = os.getenv("PERSONAL_DATA_DB_PASSWORD", '')
+    db_host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+    db_name = os.getenv("PERSONAL_DATA_DB_NAME")
+    connection = mysql.connect(
+        host=db_host, 
+        user=db_user,
+        password=db_pwd,
+        database=db_name,
+    )
+    return connection
+
+
+def main() -> None:
+    """ function that obtains a database connection using get_db
+        and returns a list of tuples containing all rows in the
+        users table
+    """
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users;")
+    for row in cursor:
+        print(row)
 
 
 if __name__ == '__main__':
