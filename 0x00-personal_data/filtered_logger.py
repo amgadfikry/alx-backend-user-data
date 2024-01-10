@@ -8,6 +8,10 @@ import os
 
 
 PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
+DB_USER = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+DB_PWD = os.getenv("PERSONAL_DATA_DB_PASSWORD", '')
+DB_HOST = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+DB_NAME = os.getenv("PERSONAL_DATA_DB_NAME")
 
 
 def filter_datum(fields: List[str], redaction: str,
@@ -66,15 +70,11 @@ def get_logger() -> logging.Logger:
 def get_db() -> mysql.connector.connection.MySQLConnection:
     """Creates a connector to a database.
     """
-    db_user = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
-    db_pwd = os.getenv("PERSONAL_DATA_DB_PASSWORD", '')
-    db_host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
-    db_name = os.getenv("PERSONAL_DATA_DB_NAME", 'holberton')
     connection = mysql.connector.connection.MySQLConnection(
-        host=db_host,
-        user=db_user,
-        password=db_pwd,
-        database=db_name,
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PWD,
+        database=DB_NAME,
     )
     return connection
 
