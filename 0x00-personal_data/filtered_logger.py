@@ -14,7 +14,7 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
     """Creates a connector to a database.
     """
     db_host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
-    db_name = os.getenv("PERSONAL_DATA_DB_NAME", "holberton")
+    db_name = os.getenv("PERSONAL_DATA_DB_NAME", "my_db")
     db_user = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
     db_pwd = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
     connection = mysql.connector.connect(
@@ -24,6 +24,18 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
         database=db_name,
     )
     return connection
+
+
+def main() -> None:
+    """ function that obtains a database connection using get_db
+        and returns a list of tuples containing all rows in the
+        users table
+    """
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users;")
+    for row in cursor:
+        print(row)
 
 
 def filter_datum(fields: List[str], redaction: str,
@@ -77,3 +89,7 @@ def get_logger() -> logging.Logger:
     log_handler.setFormatter(RedactingFormatter(PII_FIELDS))
     logger.addHandler(log_handler)
     return logger
+
+
+if __name__ == '__main__':
+    main()
