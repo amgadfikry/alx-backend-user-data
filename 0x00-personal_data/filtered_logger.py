@@ -20,7 +20,8 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
         user=user,
         password=password,
         host=host,
-        database=db
+        database=db,
+        port=3306
     )
 
 
