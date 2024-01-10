@@ -10,7 +10,7 @@ import os
 PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
 
-def get_db() -> mysql.connector.connection.MySQLConnection:
+def get_db():
     """Creates a connector to a database.
     """
     db_host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
