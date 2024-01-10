@@ -24,3 +24,24 @@ def filter_datum(fields: List[str], redaction: str,
             fr'(?<={re.escape(f)}=)(.*?)(?={re.escape(separator)})')
         message = re.sub(pattern, redaction, message)
     return message
+
+
+class RedactingFormatter(logging.Formatter):
+    """ Redacting Formatter class
+        """
+
+    REDACTION = "***"
+    FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
+    SEPARATOR = ";"
+
+    def __init__(self, fields: List[str]) -> None:
+        """ magic method start at each instance """
+        super(RedactingFormatter, self).__init__(self.FORMAT)
+        self.fields = fields
+
+    def format(self, record: logging.LogRecord) -> str:
+        """ method to filter values in incoming log records """
+        filtered_msg = filter_datum(self.fields, self.REDACTION,
+                                    record.msg, self.SEPARATOR)
+        record.msg = filtered_msg
+        return logging.Formatter(self.FORMAT).format(record)
