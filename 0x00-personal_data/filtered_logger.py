@@ -86,9 +86,15 @@ def main() -> None:
     """
     db = get_db()
     cursor = db.cursor()
+    cursor.execute('SHOW COLUMNS FROM users;')
+    columns = [column[0] for column in cursor.fetchall()]
     cursor.execute("SELECT * FROM users;")
-    for row in cursor:
-        print(row)
+    users = cursor.fetchall()
+    logger = get_logger()
+    for user in users:
+        row = ''.join(
+            f'{col}={str(user[idx])};' for idx, col in enumerate(columns))
+        logger.info(row)
 
 
 if __name__ == '__main__':
