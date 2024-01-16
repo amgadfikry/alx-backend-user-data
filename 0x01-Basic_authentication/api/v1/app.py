@@ -33,7 +33,7 @@ def filter_path():
     if auth and auth.require_auth(request.path, excluded_list):
         if not auth.authorization_header(request):
             abort(401)
-        if auth.current_user(request):
+        if not auth.current_user(request):
             abort(403)
 
 
