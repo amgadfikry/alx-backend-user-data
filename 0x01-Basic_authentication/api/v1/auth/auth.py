@@ -32,9 +32,3 @@ class Auth:
         """ get current user
         """
         return request
-
-
-class BasicAuth(Auth):
-    """ class inherit from auth class
-    """
-    pass
