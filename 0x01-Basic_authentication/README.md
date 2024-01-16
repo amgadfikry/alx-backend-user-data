@@ -165,3 +165,13 @@ Add the method def current_user(self, request=None) -> TypeVar('User') in the cl
 - You must use extract_user_credentials
 - You must use user_object_from_credentials
 - With this update, now your API is fully protected by a Basic Authentication. Enjoy!
+
+#### api/v1/auth/basic_auth.py
+Improve the method def extract_user_credentials(self, decoded_base64_authorization_header) to allow password with :
+
+#### api/v1/auth/auth.py
+Improve def require_auth(self, path, excluded_paths) by allowing * at the end of excluded paths.
+Example for excluded_paths = ["/api/v1/stat*"]:
+- /api/v1/users will return True
+- /api/v1/status will return False
+- /api/v1/stats will return False
