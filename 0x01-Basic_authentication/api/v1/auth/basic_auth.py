@@ -48,7 +48,7 @@ class BasicAuth(Auth):
         """
         if type(user_email) is not str and type(user_pwd) is not str:
             return None
-        if User.count() == 1:
+        if User.count() == 0:
             return None
         users = User.search({'email': user_email})
         if len(users) == 0:
