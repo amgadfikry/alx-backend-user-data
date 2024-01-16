@@ -31,3 +31,10 @@ def unauthorized_route():
     """ test unauthorized error with route
     """
     abort(401, "unauthorized login")
+
+
+@app_views.route('/forbidden/', strict_slashes=False)
+def not_allow_route():
+    """ test not allowed error handle with route
+    """
+    abort(403, "forbidden")
