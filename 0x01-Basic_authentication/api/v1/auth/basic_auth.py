@@ -47,9 +47,12 @@ class BasicAuth(Auth):
         """ methods get user object based on provided creditals
         """
         if type(user_email) is str and type(user_pwd) is str:
-            users = User.search({'email': user_email})
-            if len(users) > 0:
-                user = users[0]
-                if user.is_valid_password(user_pwd):
-                    return user
+            try:
+                users = User.search({'email': user_email})
+            except Exception:
+                return None
+            if len(users) <= 0:
+                return None
+            if users[0].is_valid_password(user_pwd):
+                return users[0]
         return None
