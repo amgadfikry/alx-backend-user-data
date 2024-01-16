@@ -16,9 +16,9 @@ app.register_blueprint(app_views)
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 auth = None
 auth_env = getenv('AUTH_TYPE')
-if auth_env and auth_env == 'BasicAuth':
+if auth_env and auth_env == 'basic_auth':
     auth = BasicAuth()
-elif auth_env and auth_env == 'auth':
+else:
     auth = Auth()
 excluded_list = ['/api/v1/status/',
                  '/api/v1/unauthorized/',
