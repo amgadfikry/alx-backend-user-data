@@ -18,7 +18,7 @@ auth = None
 auth_env = getenv('AUTH_TYPE')
 if auth_env and auth_env == 'BasicAuth':
     auth = BasicAuth()
-else:
+elif auth_env and auth_env == 'auth':
     auth = Auth()
 excluded_list = ['/api/v1/status/',
                  '/api/v1/unauthorized/',
