@@ -28,6 +28,7 @@ else:
 excluded_list = ['/api/v1/status/',
                  '/api/v1/unauthorized/',
                  '/api/v1/forbidden/'
+                 '/api/v1/auth_session/login/'
                  ]
 
 
@@ -36,13 +37,14 @@ def filter_path():
     """ method to check if path in excluded list or not
     """
     if auth and auth.require_auth(request.path, excluded_list):
-        if not auth.authorization_header(request):
+        header = auth.authorization_header(request)
+        cookie = auth.session_cookie(request)
+        if not header and not cookie:
             abort(401)
         user = auth.current_user(request)
         if not user:
             abort(403)
-        if user:
-            request.current_user = user
+        request.current_user = user
 
 
 @app.errorhandler(404)
