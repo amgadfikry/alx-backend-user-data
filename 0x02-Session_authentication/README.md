@@ -110,3 +110,36 @@ Update the file api/v1/views/session_auth.py, by adding a new route DELETE /api/
 - You must use auth.destroy_session(request) for deleting the Session ID contains in the request as cookie:
 -- If destroy_session returns False, abort(404)
 -- Otherwise, return an empty JSON dictionary with the status code 200
+
+#### api/v1/auth/session_exp_auth.py, api/v1/app.py
+Create a class SessionExpAuth that inherits from SessionAuth in the file api/v1/auth/session_exp_auth.py:
+- Overload def __init__(self): method:
+-- Assign an instance attribute session_duration:
+--- To the environment variable SESSION_DURATION casts to an integer
+--- If this environment variable doesn’t exist or can’t be parse to an integer, assign to 0
+- Overload def create_session(self, user_id=None):
+-- Create a Session ID by calling super() - super() will call the create_session() method of SessionAuth
+-- Return None if super() can’t create a Session ID
+-- Use this Session ID as key of the dictionary user_id_by_session_id - the value for this key must be a dictionary (called “session dictionary”):
+--- The key user_id must be set to the variable user_id
+--- The key created_at must be set to the current datetime - you must use datetime.now()
+-- Return the Session ID created
+- Overload def user_id_for_session_id(self, session_id=None):
+-- Return None if session_id is None
+-- Return None if user_id_by_session_id doesn’t contain any key equals to session_id
+-- Return the user_id key from the session dictionary if self.session_duration is equal or under 0
+-- Return None if session dictionary doesn’t contain a key created_at
+-- Return None if the created_at + session_duration seconds are before the current datetime. datetime - timedelta
+-- Otherwise, return user_id from the session dictionary
+Update api/v1/app.py to instantiate auth with SessionExpAuth if the environment variable AUTH_TYPE is equal to session_exp_auth.
+
+#### api/v1/auth/session_db_auth.py, api/v1/app.py, models/user_session.py
+Create a new model UserSession in models/user_session.py that inherits from Base:
+- Implement the def __init__(self, args: list, kwargs: dict): like in User but for these 2 attributes:
+-- user_id: string
+-- session_id: string
+Create a new authentication class SessionDBAuth in api/v1/auth/session_db_auth.py that inherits from SessionExpAuth:
+- Overload def create_session(self, user_id=None): that creates and stores new instance of UserSession and returns the Session ID
+- Overload def user_id_for_session_id(self, session_id=None): that returns the User ID by requesting UserSession in the database based on session_id
+- Overload def destroy_session(self, request=None): that destroys the UserSession based on the Session ID from the request cookie
+Update api/v1/app.py to instantiate auth with SessionDBAuth if the environment variable AUTH_TYPE is equal to session_db_auth.
