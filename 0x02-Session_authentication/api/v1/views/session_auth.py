@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ module for session auth view """
 from api.v1.views import app_views
-from flask import request, jsonify, make_response
+from flask import request, jsonify, make_response, abort
 from models.user import User
 import os
 
@@ -31,3 +31,16 @@ def login_route():
     res = make_response(jsonify(users[0].to_json()))
     res.set_cookie(env_key, session_id)
     return res
+
+
+@app_views.route('auth_session/logout', methods=['DELETE'],
+                 strict_slashes=False)
+def logout_route():
+    """ route mange logout route
+    """
+    from api.v1.app import auth
+    destroy = auth.destroy_session(request)
+    if destroy:
+        return jsonify({}), 200
+    else:
+        abort(404)
