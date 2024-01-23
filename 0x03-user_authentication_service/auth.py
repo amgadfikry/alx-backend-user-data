@@ -95,10 +95,9 @@ class Auth:
         """
         try:
             user = self._db.find_user_by(reset_token=reset_token)
-            session_id = _generate_uuid()
             self._db.update_user(
                     user.id, hashed_password=_hash_password(password),
-                    reset_token=reset_token)
-            return session_id
+                    reset_token=None)
+            return None
         except Exception:
             raise ValueError
