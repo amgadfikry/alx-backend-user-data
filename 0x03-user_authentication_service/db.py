@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """ module for database """
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.orm.exc import NoResultFound
+from typing import List
 
 
 from user import Base, User
@@ -12,13 +15,13 @@ class DB:
     """DB class
     """
 
-    def __init__(self) -> None:
+    def __init__(self):
         """Initialize a new DB instance
         """
-        self._engine = create_engine("sqlite:///a.db", echo=True)
+        self._engine = create_engine("sqlite:///a.db", echo=False)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
-        self.__session = None
+        self.__session: Session = None
 
     @property
     def _session(self) -> Session:
@@ -32,7 +35,19 @@ class DB:
     def add_user(self, email: str, hashed_password: str) -> User:
         """ add new user to database
         """
-        user = User(email=email, hashed_password=hashed_password)
+        user: User = User(email=email, hashed_password=hashed_password)
         self._session.add(user)
         self._session.commit()
         return user
+
+    def find_user_by(self, **kwargs) -> User:
+        """ return user if find it in database
+        """
+        try:
+            args: List = [getattr(User, k) == v for k, v in kwargs.items()]
+        except Exception:
+            raise InvalidRequestError
+        result = self._session.query(User).filter(and_(*args)).first()
+        if result is None:
+            raise NoResultFound
+        return result
